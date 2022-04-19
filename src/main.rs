@@ -2,7 +2,7 @@ use bitbucket_v1_client::client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = client::BitbucketClient::new();
+    let client = client::BitbucketClient::with_auth("some token here".to_string());
 
     let resp = client.get("https://www.rust-lang.org").await?;
     println!("{:#?}", resp);

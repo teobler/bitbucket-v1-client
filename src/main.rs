@@ -1,8 +1,10 @@
-use std::collections::HashMap;
+use bitbucket_v1_client::client;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let resp =
-        reqwest::blocking::get("https://httpbin.org/ip")?.json::<HashMap<String, String>>()?;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = client::BitbucketClient::new();
+
+    let resp = client.get("https://www.rust-lang.org").await?;
     println!("{:#?}", resp);
     Ok(())
 }

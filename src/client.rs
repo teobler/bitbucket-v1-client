@@ -1,4 +1,5 @@
 use reqwest::{Client, Error, Response};
+use serde::Serialize;
 
 #[derive(Debug)]
 pub struct BitbucketClient {
@@ -28,4 +29,30 @@ impl BitbucketClient {
             self.http_client.get(uri).send().await
         }
     }
+
+    pub async fn post<P>(&self, uri: &str, payload: Option<P>) -> Result<Response, Error>
+    where
+        P: Payload,
+    {
+        if let Some(ref auth) = self.bearer_auth {
+            if let Some(payload) = payload {
+                self.http_client
+                    .post(uri)
+                    .bearer_auth(auth)
+                    .json(payload)
+                    .send()
+                    .await
+            } else {
+                self.http_client.post(uri).bearer_auth(auth).send().await
+            }
+        } else {
+            if let Some(payload) = payload {
+                self.http_client.post(uri).json(payload).send().await
+            } else {
+                self.http_client.post(uri).send().await
+            }
+        }
+    }
 }
+
+trait Payload: Serialize + Send + Sync {}
